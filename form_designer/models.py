@@ -4,18 +4,19 @@ import re
 from collections import OrderedDict
 from decimal import Decimal
 
-import django
 from django.conf import settings as django_settings
 from django.db import models
+from django.template import Context, Template
+from django.template.loader import get_template
 from django.utils.deprecation import warn_about_renamed_method
 from django.utils.module_loading import import_string
 from django.utils.six import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
-from picklefield.fields import PickledObjectField
 
 from form_designer import settings
 from form_designer.fields import ModelNameField, RegexpExpressionField, TemplateCharField, TemplateTextField
 from form_designer.utils import get_random_hash, string_template_replace
+from picklefield.fields import PickledObjectField
 
 MAIL_TEMPLATE_CONTEXT_HELP_TEXT = _(
     'Your form fields are available as template context. '
@@ -104,8 +105,6 @@ class FormDefinition(models.Model):
 
     def compile_message(self, form_data, template=None):
         # TODO: refactor, move to utils
-        from django.template.loader import get_template
-        from django.template import Template
         if template:
             t = get_template(template)
         elif not self.message_template:
@@ -114,10 +113,7 @@ class FormDefinition(models.Model):
             t = Template(self.message_template)
         context = self.get_form_data_context(form_data)
         context['data'] = form_data
-        if django.VERSION[:2] < (1, 8):
-            from django.template import Context
-            context = Context(context)
-        return t.render(context)
+        return t.render(Context(context))
 
     def count_fields(self):
         return self.formdefinitionfield_set.count()
