@@ -1,6 +1,10 @@
 
 from django.contrib import messages
-from django.core.context_processors import csrf
+try:
+    from django.template.context_processors import csrf
+except ImportError:  # older Django
+    from django.core.context_processors import csrf
+
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
