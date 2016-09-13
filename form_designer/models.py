@@ -41,6 +41,7 @@ class FormDefinition(models.Model):
     title = models.CharField(_('title'), max_length=255, blank=True, null=True)
     body = models.TextField(_('body'), help_text=_('Form description. Display on form after title.'), blank=True, null=True)
     action = models.URLField(_('target URL'), help_text=_('If you leave this empty, the page where the form resides will be requested, and you can use the mail form and logging features. You can also send data to external sites: For instance, enter "http://www.google.ch/search" to create a search form.'), max_length=255, blank=True, null=True)
+    mail_cover_text = models.TextField(_('email cover text'), help_text=_('Email cover text which can be included in the default email template and in the message template.'), blank=True, null=True)
     mail_to = TemplateCharField(_('send form data to e-mail address'), help_text=_('Separate several addresses with a comma. Your form fields are available as template context. Example: "admin@domain.com, {{ from_email }}" if you have a field named `from_email`.'), max_length=255, blank=True, null=True)
     mail_from = TemplateCharField(_('sender address'), max_length=255, help_text=MAIL_TEMPLATE_CONTEXT_HELP_TEXT, blank=True, null=True)
     mail_reply_to = TemplateCharField(_('reply-to address'), max_length=255, help_text=MAIL_TEMPLATE_CONTEXT_HELP_TEXT, blank=True)
@@ -55,7 +56,7 @@ class FormDefinition(models.Model):
     success_redirect = models.BooleanField(_('HTTP redirect after successful submission'), default=True)
     success_clear = models.BooleanField(_('clear form after successful submission'), default=True)
     allow_get_initial = models.BooleanField(_('allow initial values via URL'), help_text=_('If enabled, you can fill in form fields by adding them to the query string.'), default=True)
-    message_template = TemplateTextField(_('message template'), help_text=_('Your form fields are available as template context. Example: "{{ message }}" if you have a field named `message`. To iterate over all fields, use the variable `data` (a list containing a dictionary for each form field, each containing the elements `name`, `label`, `value`).'), blank=True, null=True)
+    message_template = TemplateTextField(_('message template'), help_text=_('Your form fields are available as template context. Example: "{{ message }}" if you have a field named `message`. To iterate over all fields, use the variable `data` (a list containing a dictionary for each form field, each containing the elements `name`, `label`, `value`). If you have set up email cover text, you can use {{ mail_cover_text }} to access it.'), blank=True, null=True)
     form_template_name = models.CharField(_('form template'), max_length=255, blank=True, null=True)
     display_logged = models.BooleanField(_('display logged submissions with form'), default=False)
 
@@ -113,6 +114,7 @@ class FormDefinition(models.Model):
             t = Template(self.message_template)
         context = self.get_form_data_context(form_data)
         context['data'] = form_data
+        context['mail_cover_text'] = self.mail_cover_text or ''
         return t.render(Context(context))
 
     def count_fields(self):
