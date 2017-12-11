@@ -4,9 +4,9 @@ import re
 from collections import OrderedDict
 from decimal import Decimal
 
+import django
 from django.conf import settings as django_settings
 from django.db import models
-from django.template import Context, Template
 from django.template.loader import get_template
 from django.utils.deprecation import warn_about_renamed_method
 from django.utils.module_loading import import_string
@@ -30,6 +30,25 @@ class FormValueDict(dict):
         self['value'] = value
         self['label'] = label
         super(FormValueDict, self).__init__()
+
+
+def get_django_template_from_string(template_string):
+    if django.VERSION >= (1, 10):
+        # We need to create an ad-hoc django templates backend
+        # since we can't trust that the user's configuration
+        # even includes one.  Using the "raw" `django.template.Template`
+        # object does not work for reasons unknown (well, semi-unknown;
+        # it just seems to have a slightly different API).
+        from django.template.backends.django import DjangoTemplates
+        return DjangoTemplates({
+            'NAME': 'django-form-designer-renderer',
+            'DIRS': [],
+            'APP_DIRS': False,
+            'OPTIONS': {},
+        }).from_string(template_string)
+    else:
+        from django.template import Template
+        return Template(template_string)
 
 
 @python_2_unicode_compatible
@@ -111,11 +130,15 @@ class FormDefinition(models.Model):
         elif not self.message_template:
             t = get_template(settings.EMAIL_TEMPLATE)
         else:
-            t = Template(self.message_template)
+            t = get_django_template_from_string(self.message_template)
         context = self.get_form_data_context(form_data)
         context['data'] = form_data
         context['mail_cover_text'] = self.mail_cover_text or ''
-        return t.render(Context(context))
+        if django.VERSION < (1, 10):
+            # For old Djangoes, we need to wrap these contexts
+            from django.template import Context
+            context = Context(context)
+        return t.render(context)
 
     def count_fields(self):
         return self.formdefinitionfield_set.count()

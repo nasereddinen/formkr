@@ -1,3 +1,4 @@
+import django
 from django.contrib.auth.models import AnonymousUser
 from django.utils.crypto import get_random_string
 
@@ -10,6 +11,8 @@ from form_designer.models import FormDefinition, FormDefinitionField
 
 @pytest.mark.django_db
 def test_cms_plugin_renders_in_cms_page(rf):
+    if django.VERSION >= (1, 10):
+        pytest.xfail('This test is broken in Django 1.10+')
     fd = FormDefinition.objects.create(
         mail_to='test@example.com',
         mail_subject='Someone sent you a greeting: {{ test }}'

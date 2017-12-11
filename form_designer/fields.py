@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django import forms
+from django.core import validators
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -22,8 +23,8 @@ class ModelNameFormField(forms.CharField):
         string object.
         """
         value = super(ModelNameFormField, self).clean(value)
-        if value == u'':
-            return value
+        if value in validators.EMPTY_VALUES:
+            return u''
         if not ModelNameFormField.get_model_from_string(value):
             raise ValidationError(
                 _('Model could not be imported: %(value)s. Please use a valid model path.'),
@@ -89,6 +90,8 @@ class RegexpExpressionFormField(forms.CharField):
         Validates that the input can be compiled as a Regular Expression.
         """
         value = super(RegexpExpressionFormField, self).clean(value)
+        if value in validators.EMPTY_VALUES:
+            value = u''
         import re
         try:
             re.compile(value)

@@ -75,4 +75,7 @@ def test_admin_create_view_creates_form(admin_client, n_fields):
         if value is True:
             assert data[key] == 'on'
         else:
-            assert data[key] == value
+            if data[key] == '':
+                assert data[key] == value or value is None
+            else:
+                assert data[key] == value
