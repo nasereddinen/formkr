@@ -1,8 +1,6 @@
 sudo: false
 language: python
-cache:
-  directories:
-    - "$HOME/.cache/pip"
+cache: pip
 services:
   - mysql
 env:
