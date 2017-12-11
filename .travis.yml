@@ -13,4 +13,4 @@ python:
   - "3.6"
 install: pip install -U pip tox-travis codecov
 script: tox
-after_success: codecov -e TRAVIS_PYTHON_VERSION
+after_success: codecov -e TRAVIS_PYTHON_VERSION -e DATABASE
