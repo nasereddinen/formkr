@@ -2,6 +2,11 @@ import django
 import os
 from tempfile import gettempdir
 
+try:
+    import cms
+except ImportError:
+    cms = None
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '&nsa)3w(oz6^a1e-dj+iw9=jqps6az(&l2khgqtr)%%sj8ky@('
 DEBUG = True
@@ -19,7 +24,7 @@ WSGI_APPLICATION = 'dfd_tests.wsgi.application'
 ROOT_URLCONF = 'dfd_tests.urls'
 SITE_ID = 1
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -28,12 +33,16 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'dfd_tests',
-    'menus',
-    'cms',
-    'treebeard',
     'form_designer',
-    'form_designer.contrib.cms_plugins.form_designer_form',
-)
+]
+
+if cms:
+    INSTALLED_APPS.extend([
+        'menus',
+        'cms',
+        'treebeard',
+        'form_designer.contrib.cms_plugins.form_designer_form',
+    ])
 
 CMS_TEMPLATES = [
     ('page.html', 'page'),
