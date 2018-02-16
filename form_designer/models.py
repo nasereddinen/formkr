@@ -150,8 +150,19 @@ class FormDefinition(models.Model):
     def log(self, form, user=None):
         form_data = self.get_form_data(form)
         created_by = None
-        if user and user.is_authenticated():
-            created_by = user
+
+        # User.is_authenticated became a hybrid bool/callable property in Django 1.10,
+        # and an actual non-callable property in Django 2.0.
+        # For old versions, not calling it will result in false positives,
+        # so we have to be pretty explicit about these checks here.
+
+        if django.VERSION[0] == 2:
+            if user and user.is_authenticated:
+                created_by = user
+        else:  # TODO: Remove when Django <1.10 compat is dropped
+            if user and user.is_authenticated():
+                created_by = user
+
         flog = FormLog(form_definition=self, data=form_data, created_by=created_by)
         flog.save()
         return flog
