@@ -48,7 +48,17 @@ CMS_TEMPLATES = [
     ('page.html', 'page'),
 ]
 
-if django.VERSION[:2] < (1, 8):
+if django.VERSION[0] == 2:
+    MIDDLEWARE = [
+        'django.middleware.security.SecurityMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.middleware.common.CommonMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+        'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    ]
+elif django.VERSION[:2] < (1, 8):
     MIDDLEWARE_CLASSES = (
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.common.CommonMiddleware',
@@ -80,6 +90,7 @@ else:
         'django.middleware.security.SecurityMiddleware',
     )
 
+if django.VERSION[:2] >= (1, 8):
     TEMPLATES = [
         {
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
