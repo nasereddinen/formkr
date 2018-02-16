@@ -9,7 +9,7 @@ from form_designer.models import FormDefinition
 
 @python_2_unicode_compatible
 class CMSFormDefinition(CMSPlugin):
-    form_definition = models.ForeignKey(FormDefinition, verbose_name=_('form'))
+    form_definition = models.ForeignKey(FormDefinition, verbose_name=_('form'), on_delete=models.CASCADE)
 
     def __str__(self):
         return force_text(self.form_definition)

@@ -195,7 +195,7 @@ class FormDefinition(models.Model):
 @python_2_unicode_compatible
 class FormDefinitionField(models.Model):
 
-    form_definition = models.ForeignKey(FormDefinition)
+    form_definition = models.ForeignKey(FormDefinition, on_delete=models.CASCADE)
     field_class = models.CharField(_('field class'), max_length=100)
     position = models.IntegerField(_('position'), blank=True, null=True)
 
@@ -305,9 +305,9 @@ class FormDefinitionField(models.Model):
 
 @python_2_unicode_compatible
 class FormLog(models.Model):
-    form_definition = models.ForeignKey(FormDefinition, related_name='logs')
+    form_definition = models.ForeignKey(FormDefinition, related_name='logs', on_delete=models.CASCADE)
     created = models.DateTimeField(_('Created'), auto_now=True)
-    created_by = models.ForeignKey(getattr(django_settings, "AUTH_USER_MODEL", "auth.User"), null=True, blank=True)
+    created_by = models.ForeignKey(getattr(django_settings, "AUTH_USER_MODEL", "auth.User"), null=True, blank=True, on_delete=models.CASCADE)
     _data = None
 
     class Meta:
@@ -379,7 +379,7 @@ class FormLog(models.Model):
 
 @python_2_unicode_compatible
 class FormValue(models.Model):
-    form_log = models.ForeignKey(FormLog, related_name='values')
+    form_log = models.ForeignKey(FormLog, related_name='values', on_delete=models.CASCADE)
     field_name = models.SlugField(_('field name'), max_length=255)
     value = PickledObjectField(_('value'), null=True, blank=True)
 
