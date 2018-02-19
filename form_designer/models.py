@@ -33,7 +33,7 @@ class FormValueDict(dict):
 
 
 def get_django_template_from_string(template_string):
-    if django.VERSION >= (1, 10):
+    if django.VERSION >= (1, 9):
         # We need to create an ad-hoc django templates backend
         # since we can't trust that the user's configuration
         # even includes one.  Using the "raw" `django.template.Template`
@@ -134,7 +134,7 @@ class FormDefinition(models.Model):
         context = self.get_form_data_context(form_data)
         context['data'] = form_data
         context['mail_cover_text'] = self.mail_cover_text or ''
-        if django.VERSION < (1, 10):
+        if django.VERSION < (1, 9):
             # For old Djangoes, we need to wrap these contexts
             from django.template import Context
             context = Context(context)
