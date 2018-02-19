@@ -56,10 +56,11 @@ class TemplateFormField(forms.CharField):
         """
         value = super(TemplateFormField, self).clean(value)
         from django.template import Template, TemplateSyntaxError
-        try:
-            Template(value)
-        except TemplateSyntaxError as error:
-            raise ValidationError(error)
+        if value:
+            try:
+                Template(value)
+            except TemplateSyntaxError as error:
+                raise ValidationError(error)
         return value
 
 

@@ -4,15 +4,20 @@ from django.contrib.auth.models import AnonymousUser
 from django.template import RequestContext
 from django.utils.crypto import get_random_string
 
-import cms
 import pytest
-from cms import api
-from cms.models import Page, Placeholder
-from form_designer.contrib.cms_plugins.form_designer_form.cms_plugins import FormDesignerPlugin
-from form_designer.contrib.cms_plugins.form_designer_form.models import CMSFormDefinition
-from form_designer.models import FormDefinition, FormDefinitionField
 
-CMS_VERSION = Ver(cms.__version__)
+try:
+    import cms
+    from cms import api
+    from cms.models import Page, Placeholder
+    from form_designer.contrib.cms_plugins.form_designer_form.cms_plugins import FormDesignerPlugin
+    from form_designer.contrib.cms_plugins.form_designer_form.models import CMSFormDefinition
+    from form_designer.models import FormDefinition, FormDefinitionField
+    CMS_VERSION = Ver(cms.__version__)
+
+except ImportError:
+    pytestmark = pytest.mark.skip('django-cms not importable')
+
 
 
 @pytest.mark.django_db

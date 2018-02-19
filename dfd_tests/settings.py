@@ -2,6 +2,11 @@ import django
 import os
 from tempfile import gettempdir
 
+try:
+    import cms
+except ImportError:
+    cms = None
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '&nsa)3w(oz6^a1e-dj+iw9=jqps6az(&l2khgqtr)%%sj8ky@('
 DEBUG = True
@@ -19,7 +24,7 @@ WSGI_APPLICATION = 'dfd_tests.wsgi.application'
 ROOT_URLCONF = 'dfd_tests.urls'
 SITE_ID = 1
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -28,18 +33,32 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'dfd_tests',
-    'menus',
-    'cms',
-    'treebeard',
     'form_designer',
-    'form_designer.contrib.cms_plugins.form_designer_form',
-)
+]
+
+if cms:
+    INSTALLED_APPS.extend([
+        'menus',
+        'cms',
+        'treebeard',
+        'form_designer.contrib.cms_plugins.form_designer_form',
+    ])
 
 CMS_TEMPLATES = [
     ('page.html', 'page'),
 ]
 
-if django.VERSION[:2] < (1, 8):
+if django.VERSION[0] == 2:
+    MIDDLEWARE = [
+        'django.middleware.security.SecurityMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.middleware.common.CommonMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+        'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    ]
+elif django.VERSION[:2] < (1, 8):
     MIDDLEWARE_CLASSES = (
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.common.CommonMiddleware',
@@ -71,6 +90,7 @@ else:
         'django.middleware.security.SecurityMiddleware',
     )
 
+if django.VERSION[:2] >= (1, 8):
     TEMPLATES = [
         {
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
