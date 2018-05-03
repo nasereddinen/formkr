@@ -26,7 +26,7 @@ def _template_replace_list(input_str, context_dict):
     return [
         string_template_replace(email, context_dict)
         for email
-        in re.compile('\s*[,;]+\s*').split(force_text(input_str))
+        in re.compile(r'\s*[,;]+\s*').split(force_text(input_str))
     ]
 
 
