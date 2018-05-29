@@ -1,10 +1,13 @@
 
+import json
 from django.contrib import messages
 try:
     from django.template.context_processors import csrf
 except ImportError:  # older Django
     from django.core.context_processors import csrf
 
+from django.utils.six.moves.urllib.parse import urlencode
+from django.utils.six.moves.urllib.request import Request, urlopen
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
@@ -19,6 +22,39 @@ from form_designer.uploads import handle_uploaded_files
 
 def get_designed_form_class():
     return import_string(app_settings.DESIGNED_FORM_CLASS)
+
+
+def check_recaptcha(request, context, push_messages):
+    is_valid = True
+    if not app_settings.USE_GOOGLE_RECAPTCHA:
+        return is_valid
+    ''' Begin reCAPTCHA validation '''
+    recaptcha_response = request.POST.get('g-recaptcha-response')
+    url = 'https://www.google.com/recaptcha/api/siteverify'
+    values = {
+        'secret': app_settings.GOOGLE_RECAPTCHA_SECRET_KEY,
+        'response': recaptcha_response
+    }
+    data = urlencode(values)
+    req = Request(url, data)
+    response = urlopen(req)
+    result = json.load(response)
+    ''' End reCAPTCHA validation '''
+    if not result['success']:
+        is_valid = False
+        error_message = _('Invalid reCAPTCHA.')
+        if push_messages:
+            messages.error(request, error_message)
+    return is_valid
+
+
+def update_recaptcha_context(context):
+    if not app_settings.USE_GOOGLE_RECAPTCHA:
+        return
+    context.update({
+        'use_google_recaptcha': True,
+        'google_recaptcha_site_key': app_settings.GOOGLE_RECAPTCHA_SITE_KEY,
+    })
 
 
 def process_form(
@@ -46,7 +82,8 @@ def process_form(
     if is_submit:
         designedform_submit.send(sender=process_form, context=context,
                                  form_definition=form_definition, request=request)
-        if form.is_valid():
+        recaptcha_is_valid = check_recaptcha(request, context, push_messages)
+        if form.is_valid() and recaptcha_is_valid:
             # Handle file uploads using storage object
             files = handle_uploaded_files(form_definition, form)
 
@@ -89,6 +126,7 @@ def process_form(
         'form_definition': form_definition
     })
     context.update(csrf(request))
+    update_recaptcha_context(context)
 
     if form_definition.display_logged:
         logs = form_definition.logs.all().order_by('created')

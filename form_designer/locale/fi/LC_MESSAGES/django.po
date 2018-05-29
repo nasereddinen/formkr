@@ -461,3 +461,7 @@ msgstr "kyllä"
 #: .\templatetags\friendly.py:20
 msgid "no"
 msgstr "ei"
+
+#: .\views.py:50
+msgid "Invalid reCAPTCHA."
+msgstr "Virheellinen reCAPTCHA."
