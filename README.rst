@@ -28,6 +28,7 @@ complete with logging, validation, and redirects.
 * Customizable messages and labels
 * Supports POST and GET forms
 * Signals on form render, submission, success, error.
+* Supports google reCAPTCHA service
 
 
 Basic setup
