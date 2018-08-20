@@ -18,6 +18,7 @@ from form_designer.fields import ModelNameField, RegexpExpressionField, Template
 from form_designer.utils import get_random_hash, string_template_replace
 from picklefield.fields import PickledObjectField
 
+
 MAIL_TEMPLATE_CONTEXT_HELP_TEXT = _(
     'Your form fields are available as template context. '
     'Example: "{{ first_name }} {{ last_name }} <{{ from_email }}>" '
@@ -96,11 +97,15 @@ class FormDefinition(models.Model):
             field_dict[field.name] = field
         return field_dict
 
-    @models.permalink
     def get_absolute_url(self):
+        try:
+            from django.urls import reverse
+        except ImportError:
+            from django.core.urlresolvers import reverse
+
         if self.require_hash:
-            return ('form_designer.views.detail_by_hash', [str(self.public_hash)])
-        return ('form_designer.views.detail', [str(self.name)])
+            return reverse('form_designer.views.detail_by_hash', [str(self.public_hash)])
+        return reverse('form_designer.views.detail', [str(self.name)])
 
     def get_form_data(self, form):
         # TODO: refactor, move to utils or views
