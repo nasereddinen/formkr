@@ -10,6 +10,11 @@ from form_designer import settings
 from form_designer.forms import FormDefinitionFieldInlineForm, FormDefinitionForm
 from form_designer.models import FormDefinition, FormDefinitionField, FormLog
 
+try:
+    from django.urls import reverse
+except ImportError:
+    from django.core.urlresolvers import reverse
+
 
 class FormDefinitionFieldInline(admin.StackedInline):
     form = FormDefinitionFieldInlineForm
@@ -117,7 +122,6 @@ class FormLogAdmin(admin.ModelAdmin):
         return self.exporter_classes[format](self.model).export(request, queryset)
 
     def changelist_view(self, request, extra_context=None):
-        from django.core.urlresolvers import reverse
         extra_context = extra_context or {}
         try:
             query_string = '?' + request.META['QUERY_STRING']
