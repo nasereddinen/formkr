@@ -49,9 +49,9 @@ class FormDefinitionAdmin(admin.ModelAdmin):
 
 
 class FormLogAdmin(admin.ModelAdmin):
-    list_display = ('form_no_link', 'created', 'id', 'created_by', 'data_html')
+    list_display = ('form_definition', 'created', 'id', 'created_by', 'data_html')
     list_filter = ('form_definition',)
-    list_display_links = ()
+    list_display_links = None
     date_hierarchy = 'created'
 
     exporter_classes = {}
@@ -73,13 +73,6 @@ class FormLogAdmin(admin.ModelAdmin):
             actions[cls.export_format()] = (cls.export_view, cls.export_format(), desc)
 
         return actions
-
-    # Disabling all edit links: Hack as found at http://stackoverflow.com/questions/1618728/disable-link-to-edit-object-in-djangos-admin-display-list-only
-    def form_no_link(self, obj):
-        return '<a>%s</a>' % obj.form_definition
-    form_no_link.admin_order_field = 'form_definition'
-    form_no_link.allow_tags = True
-    form_no_link.short_description = _('Form')
 
     def get_urls(self):
         urls = [
