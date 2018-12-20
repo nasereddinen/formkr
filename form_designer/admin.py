@@ -126,11 +126,7 @@ class FormLogAdmin(admin.ModelAdmin):
 
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
-        try:
-            query_string = '?' + request.META['QUERY_STRING']
-        except (TypeError, KeyError):
-            query_string = ''
-
+        query_string = '?' + request.META.get('QUERY_STRING', '')
         exporter_links = []
         for cls in self.get_exporter_classes():
             url = reverse('admin:form_designer_export', args=(cls.export_format(),)) + query_string
