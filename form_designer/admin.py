@@ -100,19 +100,22 @@ class FormLogAdmin(admin.ModelAdmin):
         """
         The 'change list' admin view for this model.
         """
-        list_display = self.get_list_display(request)
-        list_display_links = self.get_list_display_links(request, list_display)
-        list_filter = self.get_list_filter(request)
-        ChangeList = self.get_changelist(request)
+        if hasattr(self, 'get_changelist_instance'):  # Available on Django 2.0+
+            cl = self.get_changelist_instance(request)
+        else:
+            list_display = self.get_list_display(request)
+            list_display_links = self.get_list_display_links(request, list_display)
+            list_filter = self.get_list_filter(request)
+            ChangeList = self.get_changelist(request)
 
-        cl = ChangeList(request, self.model, list_display,
-                        list_display_links, list_filter, self.date_hierarchy,
-                        self.search_fields, self.list_select_related,
-                        self.list_per_page, self.list_max_show_all, self.list_editable,
-                        self)
+            cl = ChangeList(request, self.model, list_display,
+                            list_display_links, list_filter, self.date_hierarchy,
+                            self.search_fields, self.list_select_related,
+                            self.list_per_page, self.list_max_show_all, self.list_editable,
+                            self)
 
-        if hasattr(cl, "get_query_set"):  # Old Django versions
-            return cl.get_query_set(request)
+            if hasattr(cl, "get_query_set"):  # Old Django versions
+                return cl.get_query_set(request)
         return cl.get_queryset(request)
 
     def export_view(self, request, format):
