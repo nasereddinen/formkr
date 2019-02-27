@@ -10,6 +10,11 @@ from form_designer import settings
 from form_designer.forms import FormDefinitionFieldInlineForm, FormDefinitionForm
 from form_designer.models import FormDefinition, FormDefinitionField, FormLog
 
+try:
+    from django.urls import reverse
+except ImportError:
+    from django.core.urlresolvers import reverse
+
 
 class FormDefinitionFieldInline(admin.StackedInline):
     form = FormDefinitionFieldInlineForm
@@ -44,9 +49,9 @@ class FormDefinitionAdmin(admin.ModelAdmin):
 
 
 class FormLogAdmin(admin.ModelAdmin):
-    list_display = ('form_no_link', 'created', 'id', 'created_by', 'data_html')
+    list_display = ('form_definition', 'created', 'id', 'created_by', 'data_html')
     list_filter = ('form_definition',)
-    list_display_links = ()
+    list_display_links = None
     date_hierarchy = 'created'
 
     exporter_classes = {}
@@ -69,13 +74,6 @@ class FormLogAdmin(admin.ModelAdmin):
 
         return actions
 
-    # Disabling all edit links: Hack as found at http://stackoverflow.com/questions/1618728/disable-link-to-edit-object-in-djangos-admin-display-list-only
-    def form_no_link(self, obj):
-        return '<a>%s</a>' % obj.form_definition
-    form_no_link.admin_order_field = 'form_definition'
-    form_no_link.allow_tags = True
-    form_no_link.short_description = _('Form')
-
     def get_urls(self):
         urls = [
             url(
@@ -95,19 +93,22 @@ class FormLogAdmin(admin.ModelAdmin):
         """
         The 'change list' admin view for this model.
         """
-        list_display = self.get_list_display(request)
-        list_display_links = self.get_list_display_links(request, list_display)
-        list_filter = self.get_list_filter(request)
-        ChangeList = self.get_changelist(request)
+        if hasattr(self, 'get_changelist_instance'):  # Available on Django 2.0+
+            cl = self.get_changelist_instance(request)
+        else:
+            list_display = self.get_list_display(request)
+            list_display_links = self.get_list_display_links(request, list_display)
+            list_filter = self.get_list_filter(request)
+            ChangeList = self.get_changelist(request)
 
-        cl = ChangeList(request, self.model, list_display,
-                        list_display_links, list_filter, self.date_hierarchy,
-                        self.search_fields, self.list_select_related,
-                        self.list_per_page, self.list_max_show_all, self.list_editable,
-                        self)
+            cl = ChangeList(request, self.model, list_display,
+                            list_display_links, list_filter, self.date_hierarchy,
+                            self.search_fields, self.list_select_related,
+                            self.list_per_page, self.list_max_show_all, self.list_editable,
+                            self)
 
-        if hasattr(cl, "get_query_set"):  # Old Django versions
-            return cl.get_query_set(request)
+            if hasattr(cl, "get_query_set"):  # Old Django versions
+                return cl.get_query_set(request)
         return cl.get_queryset(request)
 
     def export_view(self, request, format):
@@ -117,13 +118,8 @@ class FormLogAdmin(admin.ModelAdmin):
         return self.exporter_classes[format](self.model).export(request, queryset)
 
     def changelist_view(self, request, extra_context=None):
-        from django.core.urlresolvers import reverse
         extra_context = extra_context or {}
-        try:
-            query_string = '?' + request.META['QUERY_STRING']
-        except (TypeError, KeyError):
-            query_string = ''
-
+        query_string = '?' + request.META.get('QUERY_STRING', '')
         exporter_links = []
         for cls in self.get_exporter_classes():
             url = reverse('admin:form_designer_export', args=(cls.export_format(),)) + query_string

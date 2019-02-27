@@ -18,12 +18,17 @@ from form_designer.fields import ModelNameField, RegexpExpressionField, Template
 from form_designer.utils import get_random_hash, string_template_replace
 from picklefield.fields import PickledObjectField
 
+try:
+    from django.urls import reverse
+except ImportError:
+    from django.core.urlresolvers import reverse
 
 MAIL_TEMPLATE_CONTEXT_HELP_TEXT = _(
     'Your form fields are available as template context. '
     'Example: "{{ first_name }} {{ last_name }} <{{ from_email }}>" '
     'if you have fields named `first_name`, `last_name`, `from_email`.'
 )
+
 
 class FormValueDict(dict):
     def __init__(self, name, value, label):
@@ -98,11 +103,6 @@ class FormDefinition(models.Model):
         return field_dict
 
     def get_absolute_url(self):
-        try:
-            from django.urls import reverse
-        except ImportError:
-            from django.core.urlresolvers import reverse
-
         if self.require_hash:
             return reverse('form_designer.views.detail_by_hash', [str(self.public_hash)])
         return reverse('form_designer.views.detail', [str(self.name)])
@@ -147,6 +147,7 @@ class FormDefinition(models.Model):
 
     def count_fields(self):
         return self.formdefinitionfield_set.count()
+
     count_fields.short_description = _('Fields')
 
     def __str__(self):
@@ -210,7 +211,6 @@ class FormDefinition(models.Model):
 
 @python_2_unicode_compatible
 class FormDefinitionField(models.Model):
-
     form_definition = models.ForeignKey(FormDefinition, on_delete=models.CASCADE)
     field_class = models.CharField(_('field class'), max_length=100)
     position = models.IntegerField(_('position'), blank=True, null=True)

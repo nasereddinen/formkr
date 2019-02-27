@@ -6,8 +6,8 @@ from form_designer.models import FormDefinition
 
 
 @pytest.mark.django_db
-def test_admin_list_view_renders(admin_client):
-    assert admin_client.get("/admin/form_designer/formdefinition/").content
+def test_admin_list_view_renders(admin_client, greeting_form):
+    assert greeting_form.name in admin_client.get("/admin/form_designer/formdefinition/").content.decode()
 
 
 @pytest.mark.django_db
@@ -79,3 +79,21 @@ def test_admin_create_view_creates_form(admin_client, n_fields):
                 assert data[key] == value or value is None
             else:
                 assert data[key] == value
+
+
+@pytest.mark.django_db
+def test_admin_list_view_renders(admin_client, greeting_form_with_log):
+    log = greeting_form_with_log.logs.first()
+    greeting_value = log.data[0]['value']
+    assert greeting_value in admin_client.get("/admin/form_designer/formlog/").content.decode()
+
+
+@pytest.mark.django_db
+def test_admin_create_view_renders(admin_client, greeting_form_with_log):
+    assert admin_client.get("/admin/form_designer/formlog/add/").content
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('format', ('CSV', 'XLS'))
+def test_admin_export_view(admin_client, greeting_form_with_log, format):
+    assert admin_client.get("/admin/form_designer/formlog/export/%s/" % format).content
