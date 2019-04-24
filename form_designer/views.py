@@ -35,7 +35,7 @@ def check_recaptcha(request, context, push_messages):
         'secret': app_settings.GOOGLE_RECAPTCHA_SECRET_KEY,
         'response': recaptcha_response
     }
-    data = urlencode(values)
+    data = urlencode(values).encode('utf-8')
     req = Request(url, data)
     response = urlopen(req)
     result = json.load(response)
