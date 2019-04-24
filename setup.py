@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='django-form-designer-ai',
-    version='1.0.0',
+    version='1.0.1',
     url='http://github.com/andersinno/django-form-designer-ai',
     license='BSD',
     maintainer='Anders Innovations Ltd',
