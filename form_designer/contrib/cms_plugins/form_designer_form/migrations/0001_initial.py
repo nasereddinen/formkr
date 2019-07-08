@@ -30,11 +30,13 @@ class Migration(migrations.Migration):
                      primary_key=True,
                      to='cms.CMSPlugin',
                      parent_link=True,
+                     on_delete=models.CASCADE,
                      **field_kwargs)),
                 ('form_definition',
                  models.ForeignKey(
                      verbose_name='form',
-                     to='form_designer.FormDefinition')),
+                     to='form_designer.FormDefinition',
+                     on_delete=models.CASCADE)),
             ],
             options={
                 'abstract': False,
