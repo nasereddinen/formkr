@@ -1,4 +1,3 @@
-
 import json
 from django.contrib import messages
 try:
@@ -9,8 +8,7 @@ except ImportError:  # older Django
 from django.utils.six.moves.urllib.parse import urlencode
 from django.utils.six.moves.urllib.request import Request, urlopen
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render_to_response
-from django.template import RequestContext
+from django.shortcuts import get_object_or_404, render
 from django.utils.module_loading import import_string
 from django.utils.translation import ugettext_lazy as _
 
@@ -142,8 +140,7 @@ def _form_detail_view(request, form_definition):
     result.update({
         'form_template': form_definition.form_template_name or app_settings.DEFAULT_FORM_TEMPLATE
     })
-    return render_to_response('html/formdefinition/detail.html', result,
-                              context_instance=RequestContext(request))
+    return render('html/formdefinition/detail.html', result)
 
 
 def detail(request, object_name):
