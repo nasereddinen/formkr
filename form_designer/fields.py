@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django import forms
+from django.apps import apps
 from django.core import validators
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -13,8 +14,8 @@ class ModelNameFormField(forms.CharField):
     def get_model_from_string(model_path):
         try:
             app_label, model_name = model_path.rsplit('.models.')
-            return models.get_model(app_label, model_name)
-        except:
+            return apps.get_model(app_label, model_name)
+        except (ValueError, LookupError):
             return None
 
     def clean(self, value):
