@@ -5,8 +5,6 @@ try:
 except ImportError:  # older Django
     from django.core.context_processors import csrf
 
-from django.utils.six.moves.urllib.parse import urlencode
-from django.utils.six.moves.urllib.request import Request, urlopen
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.utils.module_loading import import_string
@@ -16,6 +14,13 @@ from form_designer import settings as app_settings
 from form_designer.models import FormDefinition
 from form_designer.signals import designedform_error, designedform_render, designedform_submit, designedform_success
 from form_designer.uploads import handle_uploaded_files
+
+try:
+    from django.utils.six.moves.urllib.parse import urlencode
+    from django.utils.six.moves.urllib.request import Request, urlopen
+except ImportError:
+    from six.moves.urllib.parse import urlencode
+    from six.moves.urllib.request import Request, urlopen
 
 
 def get_designed_form_class():

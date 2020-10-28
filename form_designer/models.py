@@ -10,7 +10,6 @@ from django.db import models
 from django.template.loader import get_template
 from django.utils.deprecation import warn_about_renamed_method
 from django.utils.module_loading import import_string
-from django.utils.six import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from form_designer import settings
@@ -22,6 +21,11 @@ try:
     from django.urls import reverse
 except ImportError:
     from django.core.urlresolvers import reverse
+
+try:
+    from django.utils.six import python_2_unicode_compatible
+except ImportError:
+    from six import python_2_unicode_compatible
 
 MAIL_TEMPLATE_CONTEXT_HELP_TEXT = _(
     'Your form fields are available as template context. '
