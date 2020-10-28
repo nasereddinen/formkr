@@ -48,7 +48,7 @@ CMS_TEMPLATES = [
     ('page.html', 'page'),
 ]
 
-if django.VERSION[0] == 2:
+if django.VERSION[0] >= 2:
     MIDDLEWARE = [
         'django.middleware.security.SecurityMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',

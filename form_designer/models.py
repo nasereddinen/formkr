@@ -166,7 +166,7 @@ class FormDefinition(models.Model):
         # For old versions, not calling it will result in false positives,
         # so we have to be pretty explicit about these checks here.
 
-        if django.VERSION[0] == 2:
+        if django.VERSION[0] >= 2:
             if user and user.is_authenticated:
                 created_by = user
         else:  # TODO: Remove when Django <1.10 compat is dropped
