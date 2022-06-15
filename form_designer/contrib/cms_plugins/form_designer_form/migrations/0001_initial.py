@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import cms
 from django.db import migrations, models
 from pkg_resources import parse_version as V

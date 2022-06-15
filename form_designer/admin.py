@@ -1,19 +1,13 @@
-from __future__ import unicode_literals
-
-from django.conf.urls import url
+from django.urls import re_path
 from django.contrib import admin
 from django.http import Http404
 from django.utils.module_loading import import_string
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from form_designer import settings
 from form_designer.forms import FormDefinitionFieldInlineForm, FormDefinitionForm
 from form_designer.models import FormDefinition, FormDefinitionField, FormLog
-
-try:
-    from django.urls import reverse
-except ImportError:
-    from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 
 class FormDefinitionFieldInline(admin.StackedInline):
@@ -76,7 +70,7 @@ class FormLogAdmin(admin.ModelAdmin):
 
     def get_urls(self):
         urls = [
-            url(
+            re_path(
                 r'^export/(?P<format>[a-zA-Z0-9_-]+)/$',
                 self.admin_site.admin_view(self.export_view),
                 name='form_designer_export'

@@ -1,12 +1,11 @@
 from django.db import models
 from django.utils.encoding import force_text
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from cms.models import CMSPlugin
-from form_designer.models import FormDefinition, python_2_unicode_compatible
+from form_designer.models import FormDefinition
 
 
-@python_2_unicode_compatible
 class CMSFormDefinition(CMSPlugin):
     form_definition = models.ForeignKey(FormDefinition, verbose_name=_('form'), on_delete=models.CASCADE)
 

@@ -1,6 +1,4 @@
 # -- encoding: UTF-8 --
-from __future__ import unicode_literals
-
 from base64 import b64decode
 
 from django.contrib.auth.models import AnonymousUser
@@ -110,7 +108,7 @@ def test_simple_form(
 ])
 @pytest.mark.parametrize('n_logs', range(5))
 def test_export(rf, greeting_form, exporter, n_logs):
-    message = u'Térve'
+    message ='Térve'
     for n in range(n_logs):
         fl = FormLog.objects.create(
             form_definition=greeting_form

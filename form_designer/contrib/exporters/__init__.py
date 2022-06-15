@@ -1,6 +1,6 @@
 from django.db.models import Count
 from django.utils.encoding import force_text
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from form_designer import settings
 from form_designer.templatetags.friendly import friendly

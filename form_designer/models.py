@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import re
 from collections import OrderedDict
 from decimal import Decimal
@@ -10,22 +8,14 @@ from django.db import models
 from django.template.loader import get_template
 from django.utils.deprecation import warn_about_renamed_method
 from django.utils.module_loading import import_string
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from form_designer import settings
 from form_designer.fields import ModelNameField, RegexpExpressionField, TemplateCharField, TemplateTextField
 from form_designer.utils import get_random_hash, string_template_replace
 from picklefield.fields import PickledObjectField
+from django.urls import reverse
 
-try:
-    from django.urls import reverse
-except ImportError:
-    from django.core.urlresolvers import reverse
-
-try:
-    from django.utils.six import python_2_unicode_compatible
-except ImportError:
-    from six import python_2_unicode_compatible
 
 MAIL_TEMPLATE_CONTEXT_HELP_TEXT = _(
     'Your form fields are available as template context. '
@@ -61,7 +51,6 @@ def get_django_template_from_string(template_string):
         return Template(template_string)
 
 
-@python_2_unicode_compatible
 class FormDefinition(models.Model):
     name = models.SlugField(_('name'), max_length=255, unique=True)
     require_hash = models.BooleanField(_('obfuscate URL to this form'), default=False, help_text=_('If enabled, the form can only be reached via a secret URL.'))
@@ -198,7 +187,7 @@ class FormDefinition(models.Model):
         if template:  # We have a custom inline template string?
             # Assume the template string is HTML-ish if it has at least one opening
             # and closing HTML tag:
-            return (re.search(u"<[^>]+>", template) and re.search(u"</[^>]+>", template))
+            return (re.search("<[^>]+>", template) and re.search("</[^>]+>", template))
 
         # If there is no custom inline template, see if the `EMAIL_TEMPLATE`
         # setting points to a `.html` file:
@@ -213,7 +202,6 @@ class FormDefinition(models.Model):
         return name
 
 
-@python_2_unicode_compatible
 class FormDefinitionField(models.Model):
     form_definition = models.ForeignKey(FormDefinition, on_delete=models.CASCADE)
     field_class = models.CharField(_('field class'), max_length=100)
@@ -323,7 +311,6 @@ class FormDefinitionField(models.Model):
         return (self.label or self.name)
 
 
-@python_2_unicode_compatible
 class FormLog(models.Model):
     form_definition = models.ForeignKey(FormDefinition, related_name='logs', on_delete=models.CASCADE)
     created = models.DateTimeField(_('Created'), auto_now=True)
@@ -397,11 +384,10 @@ class FormLog(models.Model):
             self._data = None
 
 
-@python_2_unicode_compatible
 class FormValue(models.Model):
     form_log = models.ForeignKey(FormLog, related_name='values', on_delete=models.CASCADE)
     field_name = models.SlugField(_('field name'), max_length=255)
     value = PickledObjectField(_('value'), null=True, blank=True)
 
     def __str__(self):
-        return u'%s = %s' % (self.field_name, self.value)
+        return'%s = %s' % (self.field_name, self.value)

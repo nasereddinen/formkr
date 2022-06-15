@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import hashlib
 import os
 import uuid
@@ -8,10 +6,9 @@ from django.core.files.base import File
 from django.db.models.fields.files import FieldFile
 from django.forms.forms import NON_FIELD_ERRORS
 from django.template.defaultfilters import filesizeformat
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from form_designer import settings as app_settings
-from form_designer.models import python_2_unicode_compatible
 from form_designer.utils import get_random_hash
 
 
@@ -75,7 +72,6 @@ def handle_uploaded_files(form_definition, form):
     return files
 
 
-@python_2_unicode_compatible
 class StoredUploadedFile(FieldFile):
     """
     A wrapper for uploaded files that is compatible to the FieldFile class, i.e.
@@ -86,6 +82,12 @@ class StoredUploadedFile(FieldFile):
     def __init__(self, name):
         File.__init__(self, None, name)
         self.field = self
+
+    def __getstate__(self):
+        return {'name': self.name, 'closed': False, '_committed': True, '_file': None}
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
 
     @property
     def storage(self):
