@@ -15,8 +15,9 @@ def friendly(value, null_value=None):
         value = ", ".join(force_text(object) for object in value)
     if isinstance(value, bool):
         value = yesno(value)
-    if hasattr(value, 'url'):
+    if hasattr(value, "url"):
         value = value.url
     return force_text(value)
+
 
 register.filter(friendly)
